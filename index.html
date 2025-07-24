@@ -1,120 +1,596 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Atendimento - Hospital Metropolitano</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Estilos mínimos -->
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .specialty-btn {
-            margin: 10px;
-            padding: 20px;
-            font-size: 1.2rem;
-        }
-        #print-area {
-            display: none;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 10pt;
-            white-space: pre; /* Preserva quebras de linha e espaços */
-        }
-        #debug-area {
-            margin-top: 20px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 12pt;
-            border: 1px solid #ccc;
-            padding: 10px;
-            display: none;
-        }
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #print-area, #print-area * {
-                visibility: visible;
-            }
-            #print-area {
-                position: absolute;
-                left: 0;
-                top: 0;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - VidaLeve AI</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f0f6ee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login-container h1 {
+      color: #4caf50;
+      font-size: 24px;
+      margin-bottom: 1rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"],
+    input[type="number"] {
+      padding: 0.75rem;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: white;
+      padding: 0.75rem;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    .link-small {
+      font-size: 14px;
+      color: #4caf50;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 0.5rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .loading {
+      opacity: 0.7;
+    }
+
+    .resultado-container {
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: left;
+      white-space: pre-wrap;
+      font-family: monospace;
+      color: #333;
+    }
+
+    h1, h2, h3 {
+      color: #2e7d32;
+    }
+
+    .error-message {
+      background-color: #ffebee;
+      color: #c62828;
+      padding: 1rem;
+      border-radius: 8px;
+      border-left: 4px solid #f44336;
+      margin: 1rem 0;
+      font-weight: 500;
+    }
+
+    .redirect-message {
+      background-color: #e8f5e8;
+      color: #2e7d32;
+      padding: 1rem;
+      border-radius: 8px;
+      border-left: 4px solid #4caf50;
+      margin: 1rem 0;
+      font-weight: 500;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-    <div class="container text-center my-5">
-        <h1 class="mb-4">Hospital Metropolitano - Painel de Atendimento</h1>
-        <div class="row justify-content-center">
-            <div class="col-12 col-md-6">
-                <button class="btn btn-primary specialty-btn w-100" onclick="generateTicket('Clínica Geral')">1 - Clínica Geral</button>
-            </div>
-            <div class="col-12 col-md-6">
-                <button class="btn btn-primary specialty-btn w-100" onclick="generateTicket('Pediatria')">2 - Pediatria</button>
-            </div>
-            <div class="col-12 col-md-6">
-                <button class="btn btn-primary specialty-btn w-100" onclick="generateTicket('Bariátrica')">3 - Bariátrica</button>
-            </div>
-            <div class="col-12 col-md-6">
-                <button class="btn btn-primary specialty-btn w-100" onclick="generateTicket('Cardiologia')">4 - Cardiologia</button>
-            </div>
-            <div class="col-12 col-md-6">
-                <button class="btn btn-primary specialty-btn w-100" onclick="generateTicket('Ortopedia')">5 - Ortopedia</button>
-            </div>
-            <div class="col-12 col-md-6">
-                <button class="btn btn-primary specialty-btn w-100" onclick="generateTicket('Neurologia')">6 - Neurologia</button>
-            </div>
-            <div class="col-12 col-md-6">
-                <button class="btn btn-primary specialty-btn w-100" onclick="generateTicket('Psiquiatria')">7 - Psiquiatria</button>
-            </div>
-        </div>
-        <!-- Área de depuração -->
-        <div id="debug-area"></div>
+
+  <!-- Tela de Login -->
+  <div class="login-container" id="loginScreen">
+    <h1>VidaLeve AI</h1>
+    <p>Seja bem-vindo(a)! Faça login para continuar.</p>
+
+    <form id="loginForm">
+      <label for="email">E-mail:</label>
+      <input type="email" id="email" name="email" required placeholder="seu@email.com"/>
+
+      <label for="password">Senha:</label>
+      <input type="password" id="password" name="password" required placeholder="Sua senha"/>
+
+      <button type="submit" id="loginButton">Entrar</button>
+
+      <a href="#" class="link-small" onclick="showForgotPassword()">Esqueceu sua senha?</a><br/>
+      <a href="#" class="link-small" onclick="showRegister()">Criar conta</a>
+    </form>
+  </div>
+
+  <!-- Tela de Cadastro -->
+  <div class="login-container hidden" id="registerScreen">
+    <h1>Criar Conta</h1>
+    <form id="registerForm">
+      <label for="regName">Nome completo:</label>
+      <input type="text" id="regName" required />
+
+      <label for="regEmail">E-mail:</label>
+      <input type="email" id="regEmail" required />
+
+      <label for="regPassword">Senha:</label>
+      <input type="password" id="regPassword" required />
+
+      <button type="submit" id="registerButton">Cadastrar</button>
+
+      <a href="#" class="link-small" onclick="showLogin()">Já tem conta? Entrar</a>
+    </form>
+  </div>
+
+  <!-- Tela de Recuperação de Senha -->
+  <div class="login-container hidden" id="forgotPasswordScreen">
+    <h1>Recuperar Senha</h1>
+    <form id="forgotPasswordForm">
+      <label for="resetEmail">Digite seu e-mail:</label>
+      <input type="email" id="resetEmail" required />
+
+      <button type="submit">Enviar link</button>
+
+      <a href="#" class="link-small" onclick="showLogin()">Voltar ao login</a>
+    </form>
+  </div>
+
+  <!-- Tela de Redirecionamento -->
+  <div class="login-container hidden" id="redirectScreen">
+    <div class="redirect-message">
+      <h2>✅ Login realizado com sucesso!</h2>
+      <p>Você será redirecionado automaticamente...</p>
+      <div style="margin: 20px 0;">
+        <div style="display: inline-block; width: 20px; height: 20px; border: 3px solid #4caf50; border-radius: 50%; border-top: 3px solid transparent; animation: spin 1s linear infinite;"></div>
+      </div>
+      <button onclick="showLogin()">Cancelar</button>
     </div>
+  </div>
 
-    <!-- Área de impressão -->
-    <div id="print-area"></div>
+  <style>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 
-    <!-- Bootstrap JS e Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- JavaScript para geração de senhas -->
-    <script>
-        // Contadores de senhas por especialidade
-        const ticketCounters = {
-            'Clínica Geral': 0,
-            'Pediatria': 0,
-            'Bariátrica': 0,
-            'Cardiologia': 0,
-            'Ortopedia': 0,
-            'Neurologia': 0,
-            'Psiquiatria': 0
-        };
+  <script>
+    // Função para navegar entre telas
+    function showLogin() {
+      document.getElementById('loginScreen').classList.remove('hidden');
+      document.getElementById('registerScreen').classList.add('hidden');
+      document.getElementById('forgotPasswordScreen').classList.add('hidden');
+      document.getElementById('redirectScreen').classList.add('hidden');
+    }
 
-        function generateTicket(specialty) {
-            // Incrementa o contador da especialidade
-            ticketCounters[specialty]++;
-            const ticketNumber = ticketCounters[specialty].toString().padStart(3, '0');
-            const ticketCode = `${specialty.charAt(0)}${ticketNumber}`;
-            
-            // Conteúdo da impressão em texto puro
-            const printContent = `Hospital Metropolitano\nEspecialidade: ${specialty}\nSenha: ${ticketCode}\n`;
-            
-            // Atualiza a área de impressão
-            document.getElementById('print-area').textContent = printContent;
-            
-            // Mostra o conteúdo na área de depuração
-            const debugArea = document.getElementById('debug-area');
-            debugArea.style.display = 'block';
-            debugArea.textContent = 'Conteúdo a ser impresso:\n' + printContent;
-            
-            // Força a renderização e imprime
-            window.requestAnimationFrame(() => {
-                window.print();
-            });
+    function showRegister() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('registerScreen').classList.remove('hidden');
+      document.getElementById('forgotPasswordScreen').classList.add('hidden');
+      document.getElementById('redirectScreen').classList.add('hidden');
+    }
+
+    function showForgotPassword() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('registerScreen').classList.add('hidden');
+      document.getElementById('forgotPasswordScreen').classList.remove('hidden');
+      document.getElementById('redirectScreen').classList.add('hidden');
+    }
+
+    function showRedirect() {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('registerScreen').classList.add('hidden');
+      document.getElementById('forgotPasswordScreen').classList.add('hidden');
+      document.getElementById('redirectScreen').classList.remove('hidden');
+    }
+
+    // Função para processar resposta da API de login
+    async function processLoginResponse(result) {
+      try {
+        console.log('Resultado original recebido:', result);
+        console.log('Tipo do resultado:', typeof result);
+        
+        let parsedResult = result;
+
+        // Se for string, tenta parsear como JSON
+        if (typeof result === 'string') {
+          console.log('Tentando parsear string como JSON...');
+          parsedResult = JSON.parse(result.trim());
         }
-    </script>
+
+        console.log('Resultado após parsing:', parsedResult);
+
+        // VERIFICAÇÃO ESPECÍFICA PARA O FORMATO [ { "resposta" :"erro" } ]
+        if (Array.isArray(parsedResult) && parsedResult.length > 0) {
+          const item = parsedResult[0];
+          
+          // Verifica se existe apenas o campo "resposta" com valor "erro"
+          if (item.resposta === "erro" && Object.keys(item).length === 1) {
+            alert('❌ Usuário não autorizado');
+            console.log('Usuário não autorizado - formato específico detectado');
+            return;
+          }
+        }
+
+        // Verificação adicional para objeto direto com apenas { "resposta": "erro" }
+        if (parsedResult && typeof parsedResult === 'object' && 
+            parsedResult.resposta === "erro" && 
+            Object.keys(parsedResult).length === 1) {
+          alert('❌ Usuário não autorizado');
+          console.log('Usuário não autorizado - objeto direto detectado');
+          return;
+        }
+
+        // Processar resposta de sucesso
+        let item = null;
+        
+        // Se for array com objeto
+        if (Array.isArray(parsedResult) && parsedResult.length > 0) {
+          item = parsedResult[0];
+        } 
+        // Se for objeto direto
+        else if (parsedResult && typeof parsedResult === 'object') {
+          item = parsedResult;
+        }
+
+        if (item && item.resposta && item.site) {
+          const respostaLimpa = item.resposta.trim();
+          const respostaParts = respostaLimpa.split(',').map(p => p.trim());
+
+          console.log('Partes da resposta:', respostaParts);
+
+          if (respostaParts[0] === 'sucesso' && respostaParts[1]) {
+            const webhookUrl = respostaParts[1];
+            const base64Credentials = item.site.trim();
+            
+            console.log('URL do webhook:', webhookUrl);
+            console.log('Credenciais base64:', base64Credentials);
+
+            // Decodifica as credenciais base64
+            try {
+              const decodedCredentials = atob(base64Credentials);
+              console.log('Credenciais decodificadas:', decodedCredentials);
+              
+              // Extrai usuário e senha
+              const [username, password] = decodedCredentials.split(':');
+              
+              if (username && password) {
+                // Mostra tela de redirecionamento
+                showRedirect();
+                
+                // Cria URL com Basic Auth
+                const url = new URL(webhookUrl);
+                const urlWithAuth = `${url.protocol}//${username}:${password}@${url.host}${url.pathname}${url.search}${url.hash}`;
+                
+                console.log('URL com autenticação:', urlWithAuth);
+                
+                // Redireciona após 2 segundos
+                setTimeout(() => {
+                  window.location.href = urlWithAuth;
+                }, 2000);
+                
+                return;
+              } else {
+                throw new Error('Formato de credenciais inválido');
+              }
+            } catch (decodeError) {
+              console.error('Erro ao decodificar credenciais:', decodeError);
+              alert('❌ Erro ao processar credenciais de acesso');
+              return;
+            }
+            
+          } else if (respostaParts[0] === 'erro') {
+            const errorMsg = respostaParts.slice(1).join(',') || 'Usuário não cadastrado ou credenciais inválidas.';
+            alert(`❌ ${errorMsg}`);
+            return;
+          } else {
+            alert(`❌ Status desconhecido: ${respostaParts[0]}`);
+            return;
+          }
+        } else {
+          console.log('Formato inesperado. Resultado completo:', JSON.stringify(parsedResult, null, 2));
+          alert(`❌ Formato da resposta inválido. Campos obrigatórios: resposta e site`);
+          return;
+        }
+      } catch (error) {
+        console.error('Erro ao processar resposta da API:', error);
+        alert(`❌ Erro ao processar resposta: ${error.message}`);
+      }
+    }
+
+    // Função para verificar resposta da API de cadastro
+    function processRegisterResponse(result) {
+      try {
+        console.log('Verificando resposta do cadastro:', result);
+        let parsedResult = result;
+
+        // Se for string, tenta parsear como JSON
+        if (typeof result === 'string') {
+          try {
+            parsedResult = JSON.parse(result.trim());
+          } catch (e) {
+            console.error('Erro ao parsear JSON:', e);
+            alert('❌ Cadastro não realizado. Para verificar se seu e-mail já está registrado, clique em \'Já tem conta? Entrar\' e depois em \'Esqueceu sua senha?\'');
+            return;
+          }
+        }
+
+        console.log('Resultado parseado:', parsedResult);
+
+        // Verifica se é um objeto direto com a propriedade "resposta"
+        if (parsedResult && typeof parsedResult === 'object' && parsedResult.hasOwnProperty('resposta')) {
+          const resposta = parsedResult.resposta;
+          
+          if (resposta === 'sucesso') {
+            console.log('Cadastro realizado com sucesso');
+            alert('✅ Cadastro realizado com sucesso!');
+            showLogin();
+            // Limpa os campos do formulário
+            document.getElementById('regName').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+          } else if (resposta === 'erro') {
+            console.log('Erro no cadastro');
+            alert('❌ Cadastro não realizado. Para verificar se seu e-mail já está registrado, clique em \'Já tem conta? Entrar\' e depois em \'Esqueceu sua senha?\'');
+          } else {
+            console.log('Resposta desconhecida:', resposta);
+            alert(`❌ Resposta desconhecida: ${resposta}`);
+          }
+          return;
+        }
+
+        // Se for um array (caso alternativo)
+        if (Array.isArray(parsedResult) && parsedResult.length > 0) {
+          const firstItem = parsedResult[0];
+          if (firstItem && firstItem.hasOwnProperty('resposta')) {
+            const resposta = firstItem.resposta;
+            
+            if (resposta === 'sucesso') {
+              console.log('Cadastro realizado com sucesso (formato array)');
+              alert('✅ Cadastro realizado com sucesso!');
+              showLogin();
+              // Limpa os campos do formulário
+              document.getElementById('regName').value = '';
+              document.getElementById('regEmail').value = '';
+              document.getElementById('regPassword').value = '';
+            } else if (resposta === 'erro') {
+              console.log('Erro no cadastro (formato array)');
+              alert('❌ Cadastro não realizado. Para verificar se seu e-mail já está registrado, clique em \'Já tem conta? Entrar\' e depois em \'Esqueceu sua senha?\'');
+            } else {
+              console.log('Resposta desconhecida (formato array):', resposta);
+              alert(`❌ Resposta desconhecida: ${resposta}`);
+            }
+            return;
+          }
+        }
+
+        // Se chegou até aqui, o formato não é reconhecido
+        console.log('Formato não reconhecido:', parsedResult);
+        alert('❌ Cadastro não realizado. Para verificar se seu e-mail já está registrado, clique em \'Já tem conta? Entrar\' e depois em \'Esqueceu sua senha?\'');
+
+      } catch (error) {
+        console.error('Erro ao processar resposta da API de cadastro:', error);
+        alert('❌ Cadastro não realizado. Para verificar se seu e-mail já está registrado, clique em \'Já tem conta? Entrar\' e depois em \'Esqueceu sua senha?\'');
+      }
+    }
+
+    // Login
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const loginButton = document.getElementById('loginButton');
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      // Desabilita o botão e mostra loading
+      loginButton.disabled = true;
+      loginButton.textContent = 'Entrando...';
+      loginButton.classList.add('loading');
+
+      try {
+        const response = await fetch('https://whats-n8n.lz1kff.easypanel.host/webhook-test/b75b686c-5df1-448a-af9b-cb89223c206c', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const text = await response.text();
+        console.log('Resposta bruta da API:', text);
+
+        let result;
+        try {
+          result = JSON.parse(text);
+        } catch (e) {
+          alert('⚠️ A resposta não é um JSON válido: ' + text);
+          return;
+        }
+
+        await processLoginResponse(result);
+
+      } catch (error) {
+        console.error('Erro na requisição:', error);
+        alert('⚠️ Erro ao conectar com o servidor: ' + error.message);
+      } finally {
+        // Restaura o botão
+        loginButton.disabled = false;
+        loginButton.textContent = 'Entrar';
+        loginButton.classList.remove('loading');
+      }
+    });
+
+    // Cadastro
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const registerButton = document.getElementById('registerButton');
+      const name = document.getElementById('regName').value;
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+
+      // Desabilita o botão e mostra loading
+      registerButton.disabled = true;
+      registerButton.textContent = 'Cadastrando...';
+      registerButton.classList.add('loading');
+
+      try {
+        const response = await fetch('https://whats-n8n.lz1kff.easypanel.host/webhook-test/ae24e5be-1137-42f2-a8f5-e6088c101305', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const text = await response.text();
+        console.log('Resposta bruta da API de cadastro:', text);
+
+        let result;
+        try {
+          result = JSON.parse(text);
+        } catch (e) {
+          console.error('Erro ao parsear JSON de cadastro:', e);
+          alert('❌ Cadastro não realizado. Para verificar se seu e-mail já está registrado, clique em \'Já tem conta? Entrar\' e depois em \'Esqueceu sua senha?\'');
+          return;
+        }
+
+        processRegisterResponse(result);
+
+      } catch (error) {
+        console.error('Erro na requisição de cadastro:', error);
+        alert('❌ Cadastro não realizado. Para verificar se seu e-mail já está registrado, clique em \'Já tem conta? Entrar\' e depois em \'Esqueceu sua senha?\'');
+      } finally {
+        // Restaura o botão
+        registerButton.disabled = false;
+        registerButton.textContent = 'Cadastrar';
+        registerButton.classList.remove('loading');
+      }
+    });
+
+    // Recuperação de senha
+    document.getElementById('forgotPasswordForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const submitButton = e.target.querySelector('button[type="submit"]');
+      const email = document.getElementById('resetEmail').value;
+
+      // Desabilita o botão e mostra loading
+      submitButton.disabled = true;
+      submitButton.textContent = 'Enviando...';
+      submitButton.classList.add('loading');
+
+      try {
+        const response = await fetch('https://whats-n8n.lz1kff.easypanel.host/webhook-test/0b042320-ae39-4771-a5d2-838589e2f0f7', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const text = await response.text();
+        console.log('Resposta da API de recuperação:', text);
+
+        // Tenta parsear a resposta como JSON
+        let result;
+        try {
+          result = JSON.parse(text);
+          console.log('Resultado parseado:', result);
+          
+          // Verifica se a resposta indica sucesso
+          if (result && typeof result === 'object') {
+            // Se for array
+            if (Array.isArray(result) && result.length > 0 && result[0].resposta === 'sucesso') {
+              alert(`✅ Link de recuperação enviado para: ${email}`);
+            }
+            // Se for objeto direto
+            else if (result.resposta === 'sucesso') {
+              alert(`✅ Link de recuperação enviado para: ${email}`);
+            }
+            // Se for erro
+            else if ((Array.isArray(result) && result[0]?.resposta === 'erro') || result.resposta === 'erro') {
+              alert(`❌ Erro ao enviar link de recuperação. Verifique se o e-mail está cadastrado.`);
+            }
+            else {
+              // Resposta não reconhecida, mas API respondeu
+              alert(`✅ Solicitação processada. Se o e-mail estiver cadastrado, você receberá o link em: ${email}`);
+            }
+          } else {
+            alert(`✅ Solicitação processada. Se o e-mail estiver cadastrado, você receberá o link em: ${email}`);
+          }
+        } catch (parseError) {
+          // Se não conseguir parsear como JSON, considera como sucesso
+          console.log('Resposta não é JSON válido, considerando como sucesso:', text);
+          alert(`✅ Link de recuperação enviado para: ${email}`);
+        }
+
+        // Limpa o campo e volta para o login após sucesso
+        document.getElementById('resetEmail').value = '';
+        showLogin();
+
+      } catch (error) {
+        console.error('Erro na requisição de recuperação:', error);
+        alert('❌ Erro ao conectar com o servidor. Tente novamente mais tarde.');
+      } finally {
+        // Restaura o botão
+        submitButton.disabled = false;
+        submitButton.textContent = 'Enviar link';
+        submitButton.classList.remove('loading');
+      }
+    });
+  </script>
 </body>
 </html>
